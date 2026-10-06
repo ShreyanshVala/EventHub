@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Signup.css";
 
+const API_URL = "https://eventhub-34ok.onrender.com";
+
 const Signup = () => {
   const navigate = useNavigate();
 
@@ -48,8 +50,8 @@ const Signup = () => {
     try {
       setLoading(true);
 
-      // Send user data to MongoDB through backend
-      const response = await fetch("http://localhost:5000/api/users", {
+      // Send user data to MongoDB through Render backend
+      const response = await fetch(`${API_URL}/api/users`, {
         method: "POST",
 
         headers: {

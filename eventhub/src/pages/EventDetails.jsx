@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "./EventDetails.css";
 
+const API_URL = "https://eventhub-34ok.onrender.com";
+
 function EventDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -14,7 +16,7 @@ function EventDetails() {
       try {
         setLoading(true);
 
-        const response = await fetch(`http://localhost:5000/api/events/${id}`);
+        const response = await fetch(`${API_URL}/api/events/${id}`);
 
         if (!response.ok) {
           throw new Error("Event not found");
