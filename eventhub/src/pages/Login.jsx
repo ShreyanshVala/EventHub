@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Login.css";
 
+const API_URL = "https://eventhub-34ok.onrender.com";
+
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -31,7 +33,7 @@ const Login = () => {
     try {
       setLoading(true);
 
-      const response = await fetch("http://localhost:5000/api/users/login", {
+      const response = await fetch(`${API_URL}/api/users/login`, {
         method: "POST",
 
         headers: {
