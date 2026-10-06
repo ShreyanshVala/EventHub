@@ -1,0 +1,507 @@
+/* ================================
+   EVENTS PAGE
+================================ */
+
+.events-page {
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+/* ================================
+   HEADER
+================================ */
+
+.events-header {
+  background: linear-gradient(135deg, #111827, #1e3a8a);
+  padding: 80px 20px;
+  color: white;
+  text-align: center;
+}
+
+.events-header-content {
+  max-width: 800px;
+  margin: auto;
+}
+
+.events-header-content > span {
+  display: inline-block;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #93c5fd;
+  margin-bottom: 15px;
+}
+
+.events-header h1 {
+  margin: 0 0 15px;
+  font-size: 48px;
+  font-weight: 800;
+}
+
+.events-header p {
+  margin: 0;
+  font-size: 17px;
+  line-height: 1.7;
+  color: #dbeafe;
+}
+
+/* ================================
+   FILTERS
+================================ */
+
+.filters-section {
+  background: white;
+  border-bottom: 1px solid #e5e7eb;
+  padding: 25px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.filters-container {
+  max-width: 1200px;
+  margin: auto;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.events-search {
+  flex: 1;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 16px;
+  background: #f8fafc;
+  border: 1px solid #dbe1ea;
+  border-radius: 10px;
+}
+
+.events-search span {
+  font-size: 18px;
+}
+
+.events-search input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 15px;
+  color: #111827;
+}
+
+.events-search input::placeholder {
+  color: #9ca3af;
+}
+
+.category-filter {
+  width: 220px;
+}
+
+.category-filter select {
+  width: 100%;
+  height: 50px;
+  padding: 0 14px;
+  border: 1px solid #dbe1ea;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #111827;
+  font-size: 15px;
+  outline: none;
+  cursor: pointer;
+}
+
+/* ================================
+   EVENTS SECTION
+================================ */
+
+.all-events-section {
+  max-width: 1200px;
+  margin: auto;
+  padding: 50px 20px 80px;
+}
+
+.events-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.events-top h2 {
+  margin: 0;
+  color: #111827;
+  font-size: 28px;
+}
+
+.events-top span {
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* ================================
+   EVENTS GRID
+================================ */
+
+.all-events-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+}
+
+.event-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: 0.3s ease;
+  box-shadow: 0 5px 20px rgba(15, 23, 42, 0.05);
+}
+
+.event-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(15, 23, 42, 0.12);
+}
+
+/* ================================
+   EVENT IMAGE
+================================ */
+
+.event-image-container {
+  height: 220px;
+  position: relative;
+  overflow: hidden;
+  background: #e5e7eb;
+}
+
+.event-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.4s ease;
+}
+
+.event-card:hover .event-image {
+  transform: scale(1.05);
+}
+
+.event-category {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: #2563eb;
+  color: white;
+  padding: 7px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ================================
+   EVENT CONTENT
+================================ */
+
+.event-content {
+  padding: 20px;
+}
+
+.event-content h3 {
+  margin: 0 0 15px;
+  color: #111827;
+  font-size: 20px;
+  line-height: 1.4;
+  min-height: 56px;
+}
+
+.event-info {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 20px;
+}
+
+.event-info p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+/* ================================
+   EVENT FOOTER
+================================ */
+
+.event-footer {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 17px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.price {
+  display: flex;
+  flex-direction: column;
+}
+
+.price small {
+  color: #94a3b8;
+  font-size: 11px;
+  margin-bottom: 3px;
+}
+
+.price strong {
+  color: #111827;
+  font-size: 21px;
+}
+
+.view-event-btn {
+  text-decoration: none;
+  background: #2563eb;
+  color: white;
+  padding: 11px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  transition: 0.2s ease;
+}
+
+.view-event-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* ================================
+   NO EVENTS
+================================ */
+
+.no-events {
+  text-align: center;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 70px 20px;
+}
+
+.no-events > div {
+  font-size: 50px;
+  margin-bottom: 15px;
+}
+
+.no-events h3 {
+  margin: 0 0 10px;
+  color: #111827;
+  font-size: 24px;
+}
+
+.no-events p {
+  margin: 0 0 20px;
+  color: #64748b;
+}
+
+.no-events button {
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 12px 22px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.no-events button:hover {
+  background: #1d4ed8;
+}
+
+/* ================================
+   LOADING
+================================ */
+
+.events-loading {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #dbeafe;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 20px;
+}
+
+.events-loading h2 {
+  margin: 0 0 8px;
+  color: #111827;
+}
+
+.events-loading p {
+  margin: 0;
+  color: #64748b;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ================================
+   ERROR
+================================ */
+
+.events-error {
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.error-icon {
+  font-size: 55px;
+  margin-bottom: 15px;
+}
+
+.events-error h2 {
+  margin: 0 0 10px;
+  color: #111827;
+}
+
+.events-error p {
+  max-width: 500px;
+  margin: 0 0 25px;
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.retry-btn {
+  border: none;
+  background: #2563eb;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.retry-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* ================================
+   TABLET
+================================ */
+
+@media (max-width: 1000px) {
+  .all-events-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .events-header h1 {
+    font-size: 40px;
+  }
+}
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 700px) {
+  .events-header {
+    padding: 60px 20px;
+  }
+
+  .events-header h1 {
+    font-size: 34px;
+  }
+
+  .events-header p {
+    font-size: 15px;
+  }
+
+  .filters-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .category-filter {
+    width: 100%;
+  }
+
+  .filters-section {
+    position: static;
+  }
+
+  .all-events-section {
+    padding: 35px 15px 60px;
+  }
+
+  .events-top {
+    align-items: flex-start;
+    gap: 10px;
+    flex-direction: column;
+  }
+
+  .events-top h2 {
+    font-size: 24px;
+  }
+
+  .all-events-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .event-image-container {
+    height: 230px;
+  }
+}
+
+/* ================================
+   SMALL MOBILE
+================================ */
+
+@media (max-width: 450px) {
+  .events-header h1 {
+    font-size: 30px;
+  }
+
+  .events-header-content > span {
+    font-size: 11px;
+  }
+
+  .event-content {
+    padding: 16px;
+  }
+
+  .event-content h3 {
+    font-size: 18px;
+  }
+
+  .event-footer {
+    align-items: flex-end;
+  }
+
+  .view-event-btn {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .price strong {
+    font-size: 19px;
+  }
+}
