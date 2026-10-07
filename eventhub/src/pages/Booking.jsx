@@ -15,22 +15,37 @@ function Booking() {
   const [bookingLoading, setBookingLoading] = useState(false);
 
   // =========================
-  // LOAD EVENT FROM MONGODB
+  // LOAD EVENT
   // =========================
   useEffect(() => {
     const loadEvent = async () => {
       try {
         setLoading(true);
 
+        console.log("================================");
+        console.log("BOOKING EVENT ID:", id);
+        console.log("BOOKING API URL:", `${API_URL}/api/events/${id}`);
+        console.log("================================");
+
+        if (!id) {
+          throw new Error("Event ID is missing from URL");
+        }
+
         const response = await fetch(`${API_URL}/api/events/${id}`);
 
         const data = await response.json();
 
+        console.log("EVENT API STATUS:", response.status);
+        console.log("EVENT API RESPONSE:", data);
+
         if (!response.ok) {
-          throw new Error(data.message || "Event not found");
+          throw new Error(data.message || "Unable to load event");
         }
 
-        // Only Live events can be booked
+        if (!data || !data._id) {
+          throw new Error("Invalid event data received");
+        }
+
         if (data.status !== "Live") {
           alert("This event is not available for booking.");
           navigate("/events");
@@ -39,9 +54,10 @@ function Booking() {
 
         setEvent(data);
       } catch (error) {
-        console.error("Load event error:", error);
+        console.error("LOAD EVENT ERROR:", error);
 
-        alert("Event not found!");
+        alert(error.message || "Event could not be loaded. Please try again.");
+
         navigate("/events");
       } finally {
         setLoading(false);
@@ -64,8 +80,7 @@ function Booking() {
 
       return JSON.parse(savedUser);
     } catch (error) {
-      console.error("Login data error:", error);
-
+      console.error("LOGIN DATA ERROR:", error);
       return null;
     }
   };
@@ -75,25 +90,27 @@ function Booking() {
   // =========================
   // LOADING
   // =========================
-  if (loading || !event) {
+  if (loading) {
     return (
       <div className="booking-loading">
         <div className="booking-spinner"></div>
-
         <p>Loading booking...</p>
       </div>
     );
+  }
+
+  if (!event) {
+    return null;
   }
 
   // =========================
   // PRICE
   // =========================
   const ticketPrice = Number(event.price) || 0;
-
   const totalPrice = ticketPrice * quantity;
 
   // =========================
-  // INCREASE QUANTITY
+  // QUANTITY
   // =========================
   const increaseQuantity = () => {
     if (quantity < 10) {
@@ -101,9 +118,6 @@ function Booking() {
     }
   };
 
-  // =========================
-  // DECREASE QUANTITY
-  // =========================
   const decreaseQuantity = () => {
     if (quantity > 1) {
       setQuantity((prev) => prev - 1);
@@ -114,27 +128,20 @@ function Booking() {
   // CREATE BOOKING
   // =========================
   const handleBooking = async () => {
-    // Login check
     if (!loggedInUser) {
       alert("Please login before booking.");
-
       navigate("/login");
-
       return;
     }
 
     try {
       setBookingLoading(true);
 
-      // Generate booking ID
       const bookingId = "BK" + Date.now();
 
-      // Booking data for MongoDB
       const newBooking = {
-        bookingId: bookingId,
-
+        bookingId,
         eventId: event._id,
-
         eventName: event.title,
 
         customerName: loggedInUser.name || loggedInUser.fullName || "User",
@@ -145,34 +152,32 @@ function Booking() {
           loggedInUser.phone || loggedInUser.mobile || "Not provided",
 
         tickets: quantity,
-
-        ticketPrice: ticketPrice,
-
-        totalPrice: totalPrice,
+        ticketPrice,
+        totalPrice,
 
         eventDate: event.date,
-
         eventLocation: event.location || "",
 
         status: "Confirmed",
       };
 
+      console.log("================================");
       console.log("BOOKING DATA:", newBooking);
+      console.log("BOOKING API:", `${API_URL}/api/bookings`);
+      console.log("================================");
 
-      // =========================
-      // SAVE BOOKING TO MONGODB
-      // =========================
       const response = await fetch(`${API_URL}/api/bookings`, {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
         body: JSON.stringify(newBooking),
       });
 
       const data = await response.json();
+
+      console.log("BOOKING RESPONSE STATUS:", response.status);
+      console.log("BOOKING RESPONSE:", data);
 
       if (!response.ok) {
         throw new Error(data.message || "Booking failed");
@@ -180,14 +185,11 @@ function Booking() {
 
       console.log("BOOKING CREATED:", data);
 
-      // =========================
-      // SUCCESS
-      // =========================
       alert("Booking successful!");
 
       navigate(`/booking-success/${data.bookingId}`);
     } catch (error) {
-      console.error("Booking Error:", error);
+      console.error("BOOKING ERROR:", error);
 
       alert(error.message || "Booking failed. Please try again.");
     } finally {
@@ -195,11 +197,12 @@ function Booking() {
     }
   };
 
+  // =========================
+  // UI
+  // =========================
   return (
     <div className="booking-page">
-      {/* =========================
-          HEADER
-      ========================= */}
+      {/* HEADER */}
       <section className="booking-header">
         <div className="booking-header-content">
           <span>EVENTHUB BOOKING</span>
@@ -212,14 +215,10 @@ function Booking() {
         </div>
       </section>
 
-      {/* =========================
-          MAIN
-      ========================= */}
+      {/* MAIN */}
       <section className="booking-container">
         <div className="booking-layout">
-          {/* =========================
-              EVENT CARD
-          ========================= */}
+          {/* EVENT CARD */}
           <div className="booking-event-card">
             <div className="booking-event-image">
               <img
@@ -241,35 +240,29 @@ function Booking() {
               <h2>{event.title}</h2>
 
               <div className="booking-event-details">
-                {/* Date */}
                 <div>
                   <span>📅</span>
 
                   <div>
                     <small>Date</small>
-
                     <strong>{event.date}</strong>
                   </div>
                 </div>
 
-                {/* Time */}
                 <div>
                   <span>⏰</span>
 
                   <div>
                     <small>Time</small>
-
                     <strong>{event.time || "Not available"}</strong>
                   </div>
                 </div>
 
-                {/* Location */}
                 <div>
                   <span>📍</span>
 
                   <div>
                     <small>Location</small>
-
                     <strong>{event.location || "Not available"}</strong>
                   </div>
                 </div>
@@ -281,13 +274,11 @@ function Booking() {
             </div>
           </div>
 
-          {/* =========================
-              BOOKING CARD
-          ========================= */}
+          {/* BOOKING CARD */}
           <div className="booking-form-card">
             <h2>Booking Summary</h2>
 
-            {/* User */}
+            {/* USER */}
             <div className="booking-user">
               <div className="user-avatar">👤</div>
 
@@ -302,7 +293,7 @@ function Booking() {
               </div>
             </div>
 
-            {/* Quantity */}
+            {/* QUANTITY */}
             <div className="ticket-section">
               <label>Number of Tickets</label>
 
@@ -327,28 +318,25 @@ function Booking() {
               </div>
             </div>
 
-            {/* Price */}
+            {/* PRICE */}
             <div className="price-summary">
               <div>
                 <span>Ticket Price</span>
-
                 <strong>₹{ticketPrice}</strong>
               </div>
 
               <div>
                 <span>Tickets</span>
-
                 <strong>× {quantity}</strong>
               </div>
 
               <div className="total-price">
                 <span>Total Amount</span>
-
                 <strong>₹{totalPrice}</strong>
               </div>
             </div>
 
-            {/* Confirm */}
+            {/* CONFIRM */}
             <button
               type="button"
               className="confirm-booking-btn"
