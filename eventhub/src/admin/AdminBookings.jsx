@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./AdminBookings.css";
 
+// LIVE BACKEND
+const API_URL = "https://eventhub-34ok.onrender.com";
+
 function AdminBookings() {
   const navigate = useNavigate();
 
@@ -9,6 +12,7 @@ function AdminBookings() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   // =========================
   // ADMIN CHECK + LOAD
@@ -25,13 +29,14 @@ function AdminBookings() {
   }, [navigate]);
 
   // =========================
-  // LOAD BOOKINGS FROM MONGODB
+  // LOAD BOOKINGS FROM LIVE BACKEND
   // =========================
   const loadBookings = async () => {
     try {
       setLoading(true);
+      setError("");
 
-      const response = await fetch("http://localhost:5000/api/bookings");
+      const response = await fetch(`${API_URL}/api/bookings`);
 
       const data = await response.json();
 
@@ -39,11 +44,17 @@ function AdminBookings() {
         throw new Error(data.message || "Failed to load bookings");
       }
 
-      setBookings(data);
+      console.log("Live Bookings:", data);
+
+      setBookings(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Load bookings error:", error);
 
-      alert("Failed to load bookings.");
+      setBookings([]);
+
+      setError(
+        "Unable to load bookings. Please check the live backend connection.",
+      );
     } finally {
       setLoading(false);
     }
@@ -60,12 +71,9 @@ function AdminBookings() {
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/bookings/${mongoId}`,
-        {
-          method: "DELETE",
-        },
-      );
+      const response = await fetch(`${API_URL}/api/bookings/${mongoId}`, {
+        method: "DELETE",
+      });
 
       const data = await response.json();
 
@@ -196,7 +204,7 @@ function AdminBookings() {
             <div>
               <span>Total Bookings</span>
 
-              <strong>{totalBookings}</strong>
+              <strong>{loading ? "..." : totalBookings}</strong>
             </div>
           </div>
 
@@ -206,7 +214,7 @@ function AdminBookings() {
             <div>
               <span>Confirmed</span>
 
-              <strong>{confirmedBookings}</strong>
+              <strong>{loading ? "..." : confirmedBookings}</strong>
             </div>
           </div>
 
@@ -216,7 +224,9 @@ function AdminBookings() {
             <div>
               <span>Total Revenue</span>
 
-              <strong>₹{totalRevenue.toLocaleString("en-IN")}</strong>
+              <strong>
+                {loading ? "..." : `₹${totalRevenue.toLocaleString("en-IN")}`}
+              </strong>
             </div>
           </div>
         </div>
@@ -263,9 +273,32 @@ function AdminBookings() {
             </div>
           </div>
 
-          {/* LOADING */}
+          {/* ERROR */}
 
-          {loading ? (
+          {error ? (
+            <div className="no-bookings">
+              <div className="no-bookings-icon">⚠️</div>
+
+              <h3>Something Went Wrong</h3>
+
+              <p>{error}</p>
+
+              <button
+                onClick={loadBookings}
+                className="view-booking-btn"
+                style={{
+                  border: "none",
+                  cursor: "pointer",
+                  padding: "10px 18px",
+                  marginTop: "10px",
+                }}
+              >
+                Try Again
+              </button>
+            </div>
+          ) : loading ? (
+            /* LOADING */
+
             <div className="no-bookings">
               <div className="no-bookings-icon">⏳</div>
 
@@ -308,7 +341,7 @@ function AdminBookings() {
 
                       <td>
                         <strong className="booking-id">
-                          {booking.bookingId}
+                          {booking.bookingId || booking._id}
                         </strong>
                       </td>
 
@@ -388,7 +421,9 @@ function AdminBookings() {
                           {/* View */}
 
                           <Link
-                            to={`/admin/bookings/${booking.bookingId}`}
+                            to={`/admin/bookings/${
+                              booking.bookingId || booking._id
+                            }`}
                             className="view-booking-btn"
                             title="View Booking"
                           >
@@ -421,10 +456,6 @@ function AdminBookings() {
 // =========================
 // EVENT TIME HELPER
 // =========================
-// Current Booking schema does not store eventTime.
-// So currently we show "Time unavailable".
-//
-// Later we can populate event details from Event collection.
 
 const eventTimeFromBooking = (booking) => {
   return booking.eventTime || "Time unavailable";
