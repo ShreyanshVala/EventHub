@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import "./BookingSuccess.css";
 
+const API_URL =
+  import.meta.env.VITE_API_BASE_URL || "https://eventhub-34ok.onrender.com";
+
 const BookingSuccess = () => {
   const { id } = useParams();
 
@@ -19,12 +22,20 @@ const BookingSuccess = () => {
         setLoading(true);
         setError("");
 
-        // Get booking using bookingId (BK...)
-        const bookingResponse = await fetch(
-          `http://localhost:5000/api/bookings/booking-id/${id}`,
-        );
+        console.log("BOOKING ID:", id);
+
+        // =========================
+        // GET BOOKING FROM MONGODB
+        // =========================
+        const bookingUrl = `${API_URL}/api/bookings/booking-id/${id}`;
+
+        console.log("BOOKING API URL:", bookingUrl);
+
+        const bookingResponse = await fetch(bookingUrl);
 
         const bookingData = await bookingResponse.json();
+
+        console.log("BOOKING RESPONSE:", bookingResponse.status, bookingData);
 
         if (!bookingResponse.ok) {
           throw new Error(bookingData.message || "Booking not found");
@@ -32,14 +43,20 @@ const BookingSuccess = () => {
 
         setBooking(bookingData);
 
-        // Get related event from MongoDB
+        // =========================
+        // GET RELATED EVENT
+        // =========================
         if (bookingData.eventId) {
           try {
-            const eventResponse = await fetch(
-              `http://localhost:5000/api/events/${bookingData.eventId}`,
-            );
+            const eventUrl = `${API_URL}/api/events/${bookingData.eventId}`;
+
+            console.log("EVENT API URL:", eventUrl);
+
+            const eventResponse = await fetch(eventUrl);
 
             const eventData = await eventResponse.json();
+
+            console.log("EVENT RESPONSE:", eventResponse.status, eventData);
 
             if (eventResponse.ok) {
               setEvent(eventData);
@@ -59,6 +76,9 @@ const BookingSuccess = () => {
 
     if (id) {
       fetchBookingDetails();
+    } else {
+      setError("Booking ID is missing");
+      setLoading(false);
     }
   }, [id]);
 
@@ -105,7 +125,6 @@ const BookingSuccess = () => {
   // =========================
   // EVENT INFORMATION
   // =========================
-
   const eventTitle = booking.eventName || event?.title || "Event";
 
   const eventDate = booking.eventDate || event?.date || "Not available";
@@ -138,9 +157,7 @@ const BookingSuccess = () => {
   return (
     <div className="booking-success-page">
       <div className="success-container">
-        {/* =========================
-            SUCCESS HEADER
-        ========================= */}
+        {/* SUCCESS HEADER */}
         <div className="success-header">
           <div className="success-check">✓</div>
 
@@ -152,9 +169,7 @@ const BookingSuccess = () => {
           </p>
         </div>
 
-        {/* =========================
-            TICKET
-        ========================= */}
+        {/* TICKET */}
         <div className="ticket-card">
           {/* Ticket Header */}
           <div className="ticket-header">
@@ -323,9 +338,7 @@ const BookingSuccess = () => {
           </div>
         </div>
 
-        {/* =========================
-            BUTTONS
-        ========================= */}
+        {/* BUTTONS */}
         <div className="success-actions">
           <button className="print-btn" onClick={() => window.print()}>
             🖨️ Print Ticket
@@ -340,34 +353,28 @@ const BookingSuccess = () => {
           </Link>
         </div>
 
-        {/* =========================
-            IMPORTANT INFORMATION
-        ========================= */}
+        {/* IMPORTANT INFORMATION */}
         <div className="important-info">
           <h3>Important Information</h3>
 
           <div className="important-grid">
             <div>
               <span>✓</span>
-
               <p>Please carry a valid ID proof along with your ticket.</p>
             </div>
 
             <div>
               <span>✓</span>
-
               <p>Show your booking ticket at the event entrance.</p>
             </div>
 
             <div>
               <span>✓</span>
-
               <p>Please arrive at least 30 minutes before the event starts.</p>
             </div>
 
             <div>
               <span>✓</span>
-
               <p>This ticket is valid only for the selected event and date.</p>
             </div>
           </div>
