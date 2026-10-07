@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./MyBooking.css";
 
+const API_URL = "https://eventhub-34ok.onrender.com";
+
 const MyBooking = () => {
   const navigate = useNavigate();
 
@@ -19,9 +21,12 @@ const MyBooking = () => {
 
       if (userData) {
         setLoggedInUser(JSON.parse(userData));
+      } else {
+        setLoading(false);
       }
     } catch (err) {
       console.error("Login data error:", err);
+      setLoading(false);
     }
   }, []);
 
@@ -39,19 +44,29 @@ const MyBooking = () => {
         setLoading(true);
         setError("");
 
+        console.log(
+          "MY BOOKINGS API:",
+          `${API_URL}/api/bookings/user/${encodeURIComponent(
+            loggedInUser.email,
+          )}`,
+        );
+
         const response = await fetch(
-          `http://localhost:5000/api/bookings/user/${encodeURIComponent(
+          `${API_URL}/api/bookings/user/${encodeURIComponent(
             loggedInUser.email,
           )}`,
         );
 
         const data = await response.json();
 
+        console.log("MY BOOKINGS STATUS:", response.status);
+        console.log("MY BOOKINGS RESPONSE:", data);
+
         if (!response.ok) {
           throw new Error(data.message || "Failed to load bookings");
         }
 
-        setMyBookings(data);
+        setMyBookings(Array.isArray(data) ? data : []);
       } catch (err) {
         console.error("Fetch bookings error:", err);
         setError("Unable to load your bookings. Please try again.");
@@ -132,9 +147,7 @@ const MyBooking = () => {
   return (
     <div className="my-booking-page">
       <div className="my-booking-container">
-        {/* =========================
-            HEADER
-        ========================= */}
+        {/* HEADER */}
         <div className="my-booking-header">
           <div>
             <span className="page-label">MY ACCOUNT</span>
@@ -151,9 +164,7 @@ const MyBooking = () => {
           </Link>
         </div>
 
-        {/* =========================
-            BOOKING COUNT
-        ========================= */}
+        {/* BOOKING COUNT */}
         {myBookings.length > 0 && (
           <div className="booking-count">
             <span>Your Bookings</span>
@@ -162,9 +173,7 @@ const MyBooking = () => {
           </div>
         )}
 
-        {/* =========================
-            NO BOOKINGS
-        ========================= */}
+        {/* NO BOOKINGS */}
         {myBookings.length === 0 ? (
           <div className="booking-empty-card">
             <div className="empty-icon">🎟️</div>
@@ -181,9 +190,7 @@ const MyBooking = () => {
             </Link>
           </div>
         ) : (
-          /* =========================
-             BOOKING LIST
-          ========================= */
+          /* BOOKING LIST */
           <div className="booking-list">
             {myBookings.map((booking) => (
               <div className="booking-card" key={booking._id}>
