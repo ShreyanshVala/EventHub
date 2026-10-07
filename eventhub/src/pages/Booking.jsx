@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "./Booking.css";
 
+const API_URL =
+  import.meta.env.VITE_API_BASE_URL || "https://eventhub-34ok.onrender.com";
+
 function Booking() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -19,7 +22,7 @@ function Booking() {
       try {
         setLoading(true);
 
-        const response = await fetch(`http://localhost:5000/api/events/${id}`);
+        const response = await fetch(`${API_URL}/api/events/${id}`);
 
         const data = await response.json();
 
@@ -30,7 +33,6 @@ function Booking() {
         // Only Live events can be booked
         if (data.status !== "Live") {
           alert("This event is not available for booking.");
-
           navigate("/events");
           return;
         }
@@ -40,7 +42,6 @@ function Booking() {
         console.error("Load event error:", error);
 
         alert("Event not found!");
-
         navigate("/events");
       } finally {
         setLoading(false);
@@ -159,9 +160,9 @@ function Booking() {
       console.log("BOOKING DATA:", newBooking);
 
       // =========================
-      // SAVE TO MONGODB
+      // SAVE BOOKING TO MONGODB
       // =========================
-      const response = await fetch("http://localhost:5000/api/bookings", {
+      const response = await fetch(`${API_URL}/api/bookings`, {
         method: "POST",
 
         headers: {
