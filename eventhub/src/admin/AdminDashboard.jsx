@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./AdminDashboard.css";
 
+// LIVE BACKEND
+const API_URL = "https://eventhub-34ok.onrender.com";
+
 const AdminDashboard = () => {
   const navigate = useNavigate();
 
@@ -30,13 +33,13 @@ const AdminDashboard = () => {
   }, [navigate]);
 
   // =========================
-  // LOAD EVENTS FROM MONGODB
+  // LOAD EVENTS FROM LIVE MONGODB
   // =========================
   const loadEvents = async () => {
     try {
       setLoadingEvents(true);
 
-      const response = await fetch("http://localhost:5000/api/events");
+      const response = await fetch(`${API_URL}/api/events`);
 
       if (!response.ok) {
         throw new Error("Failed to load events");
@@ -44,22 +47,25 @@ const AdminDashboard = () => {
 
       const data = await response.json();
 
-      setEvents(data);
+      console.log("Live Events:", data);
+
+      setEvents(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Dashboard events error:", error);
+      setEvents([]);
     } finally {
       setLoadingEvents(false);
     }
   };
 
   // =========================
-  // LOAD BOOKINGS FROM MONGODB
+  // LOAD BOOKINGS FROM LIVE MONGODB
   // =========================
   const loadBookings = async () => {
     try {
       setLoadingBookings(true);
 
-      const response = await fetch("http://localhost:5000/api/bookings");
+      const response = await fetch(`${API_URL}/api/bookings`);
 
       if (!response.ok) {
         throw new Error("Failed to load bookings");
@@ -67,22 +73,25 @@ const AdminDashboard = () => {
 
       const data = await response.json();
 
-      setBookings(data);
+      console.log("Live Bookings:", data);
+
+      setBookings(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Dashboard bookings error:", error);
+      setBookings([]);
     } finally {
       setLoadingBookings(false);
     }
   };
 
   // =========================
-  // LOAD USERS FROM MONGODB
+  // LOAD USERS FROM LIVE MONGODB
   // =========================
   const loadUsers = async () => {
     try {
       setLoadingUsers(true);
 
-      const response = await fetch("http://localhost:5000/api/users");
+      const response = await fetch(`${API_URL}/api/users`);
 
       if (!response.ok) {
         throw new Error("Failed to load users");
@@ -90,9 +99,12 @@ const AdminDashboard = () => {
 
       const data = await response.json();
 
-      setUsers(data);
+      console.log("Live Users:", data);
+
+      setUsers(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Dashboard users error:", error);
+      setUsers([]);
     } finally {
       setLoadingUsers(false);
     }
@@ -101,7 +113,9 @@ const AdminDashboard = () => {
   // =========================
   // LIVE EVENTS
   // =========================
-  const liveEvents = events.filter((event) => event.status === "Live");
+  const liveEvents = events.filter(
+    (event) => event.status?.toLowerCase() === "live",
+  );
 
   // =========================
   // RECENT BOOKINGS
