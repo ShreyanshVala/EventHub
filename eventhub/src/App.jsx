@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 
 // Components
 import Navbar from "./Components/Navbar";
@@ -32,86 +32,83 @@ import AdminBookingDetails from "./admin/AdminBookingDetails";
 import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
-function App() {
-  return (
-    <BrowserRouter>
-      {/* Navbar */}
-      <Navbar />
+function AppContent() {
+  const location = useLocation();
 
-      {/* All Routes */}
+  // Admin pages par normal Navbar/Footer nahi batavva
+  const isAdminPage = location.pathname.startsWith("/admin");
+
+  return (
+    <>
+      {/* Normal Navbar only */}
+      {!isAdminPage && <Navbar />}
+
       <Routes>
         {/* ==================== PUBLIC ROUTES ==================== */}
 
-        {/* Home */}
         <Route path="/" element={<Home />} />
 
-        {/* Events */}
         <Route path="/events" element={<Events />} />
 
-        {/* Event Details */}
         <Route path="/events/:id" element={<EventDetails />} />
 
-        {/* Authentication */}
         <Route path="/login" element={<Login />} />
 
         <Route path="/signup" element={<Signup />} />
 
-        {/* About */}
         <Route path="/about" element={<About />} />
 
-        {/* Contact */}
         <Route path="/contact" element={<Contact />} />
 
-        {/* Booking Success */}
         <Route path="/booking-success/:id" element={<BookingSuccess />} />
 
-        {/* Admin Login */}
+        {/* ==================== ADMIN LOGIN ==================== */}
+
         <Route path="/admin/login" element={<AdminLogin />} />
 
         {/* ==================== PROTECTED USER ROUTES ==================== */}
 
         <Route element={<ProtectedUserRoute />}>
-          {/* My Bookings */}
           <Route path="/my-bookings" element={<MyBooking />} />
 
-          {/* Profile */}
           <Route path="/profile" element={<Profile />} />
 
-          {/* Booking */}
           <Route path="/events/:id/book" element={<Booking />} />
         </Route>
 
         {/* ==================== PROTECTED ADMIN ROUTES ==================== */}
 
         <Route element={<ProtectedAdminRoute />}>
-          {/* Admin Dashboard */}
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
-          {/* Add Event */}
           <Route path="/admin/events/add" element={<AddEvent />} />
 
-          {/* Manage Events */}
           <Route path="/admin/events" element={<AdminEvents />} />
 
-          {/* Edit Event */}
           <Route path="/admin/events/edit/:id" element={<EditEvent />} />
 
-          {/* Manage Bookings */}
           <Route path="/admin/bookings" element={<AdminBookings />} />
 
-          {/* Booking Details */}
           <Route path="/admin/bookings/:id" element={<AdminBookingDetails />} />
 
-          {/* Manage Users */}
           <Route path="/admin/users" element={<AdminUsers />} />
         </Route>
 
-        {/* 404 Page */}
+        {/* ==================== 404 ==================== */}
+
         <Route path="*" element={<NotFound />} />
       </Routes>
 
-      {/* Footer */}
-      <Footer />
+      {/* Normal Footer only */}
+      {!isAdminPage && <Footer />}
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }

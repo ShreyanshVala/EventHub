@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./AddEvent.css";
 
+// LIVE BACKEND
+const API_URL = "https://eventhub-34ok.onrender.com";
+
 const AddEvent = () => {
   const navigate = useNavigate();
 
@@ -23,35 +26,47 @@ const AddEvent = () => {
   const [success, setSuccess] = useState("");
   const [saving, setSaving] = useState(false);
 
-  // Admin check
+  // =========================
+  // ADMIN CHECK
+  // =========================
   if (!admin) {
     return (
       <div className="admin-page-message">
         <h2>Admin Login Required</h2>
+
         <Link to="/admin/login">Go to Admin Login</Link>
       </div>
     );
   }
 
+  // =========================
+  // HANDLE INPUT CHANGE
+  // =========================
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
 
     setError("");
     setSuccess("");
   };
 
+  // =========================
+  // SUBMIT EVENT
+  // =========================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     setError("");
     setSuccess("");
 
-    // Validation
+    // =========================
+    // VALIDATION
+    // =========================
+
     if (!formData.title.trim()) {
       setError("Please enter event name.");
       return;
@@ -72,7 +87,7 @@ const AddEvent = () => {
       return;
     }
 
-    if (!formData.price || Number(formData.price) < 0) {
+    if (formData.price === "" || Number(formData.price) < 0) {
       setError("Please enter a valid event price.");
       return;
     }
@@ -85,12 +100,17 @@ const AddEvent = () => {
     try {
       setSaving(true);
 
-      // Send event to Backend
-      const response = await fetch("http://localhost:5000/api/events", {
+      // =========================
+      // SEND EVENT TO LIVE BACKEND
+      // =========================
+
+      const response = await fetch(`${API_URL}/api/events`, {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
         },
+
         body: JSON.stringify({
           title: formData.title.trim(),
           category: formData.category,
@@ -104,17 +124,24 @@ const AddEvent = () => {
         }),
       });
 
+      // =========================
+      // RESPONSE
+      // =========================
+
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to add event");
+        throw new Error(data.message || "Failed to add event.");
       }
 
-      console.log("Event created:", data);
+      console.log("Event created successfully:", data);
 
       setSuccess("Event added successfully!");
 
-      // Go to Admin Events page
+      // =========================
+      // GO TO ADMIN EVENTS
+      // =========================
+
       setTimeout(() => {
         navigate("/admin/events");
       }, 800);
@@ -123,7 +150,7 @@ const AddEvent = () => {
 
       setError(
         err.message ||
-          "Unable to add event. Please make sure the backend is running.",
+          "Unable to add event. Please check the backend connection.",
       );
     } finally {
       setSaving(false);
@@ -132,7 +159,10 @@ const AddEvent = () => {
 
   return (
     <div className="add-event-page">
-      {/* Header */}
+      {/* =========================
+          HEADER
+      ========================= */}
+
       <div className="add-event-topbar">
         <div>
           <span className="add-event-label">EVENT MANAGEMENT</span>
@@ -147,26 +177,38 @@ const AddEvent = () => {
         </Link>
       </div>
 
-      {/* Form */}
+      {/* =========================
+          FORM CARD
+      ========================= */}
+
       <div className="add-event-card">
         <form onSubmit={handleSubmit}>
-          {/* Messages */}
+          {/* =========================
+              MESSAGES
+          ========================= */}
+
           {error && <div className="add-event-error">⚠️ {error}</div>}
 
           {success && <div className="add-event-success">✓ {success}</div>}
 
-          {/* Basic Information */}
+          {/* =========================
+              01 BASIC INFORMATION
+          ========================= */}
+
           <div className="form-section">
             <div className="form-section-title">
               <span>01</span>
 
               <div>
                 <h2>Basic Information</h2>
+
                 <p>Enter the basic details of your event.</p>
               </div>
             </div>
 
             <div className="form-grid">
+              {/* Event Name */}
+
               <div className="form-group full-width">
                 <label>
                   Event Name <span>*</span>
@@ -180,6 +222,8 @@ const AddEvent = () => {
                   onChange={handleChange}
                 />
               </div>
+
+              {/* Category */}
 
               <div className="form-group">
                 <label>
@@ -202,6 +246,8 @@ const AddEvent = () => {
                 </select>
               </div>
 
+              {/* Price */}
+
               <div className="form-group">
                 <label>
                   Ticket Price <span>*</span>
@@ -223,18 +269,24 @@ const AddEvent = () => {
             </div>
           </div>
 
-          {/* Date & Location */}
+          {/* =========================
+              02 DATE & LOCATION
+          ========================= */}
+
           <div className="form-section">
             <div className="form-section-title">
               <span>02</span>
 
               <div>
                 <h2>Date & Location</h2>
+
                 <p>Tell users when and where the event happens.</p>
               </div>
             </div>
 
             <div className="form-grid">
+              {/* Date */}
+
               <div className="form-group">
                 <label>
                   Event Date <span>*</span>
@@ -248,6 +300,8 @@ const AddEvent = () => {
                 />
               </div>
 
+              {/* Time */}
+
               <div className="form-group">
                 <label>
                   Event Time <span>*</span>
@@ -260,6 +314,8 @@ const AddEvent = () => {
                   onChange={handleChange}
                 />
               </div>
+
+              {/* Location */}
 
               <div className="form-group full-width">
                 <label>
@@ -277,13 +333,17 @@ const AddEvent = () => {
             </div>
           </div>
 
-          {/* Image */}
+          {/* =========================
+              03 EVENT IMAGE
+          ========================= */}
+
           <div className="form-section">
             <div className="form-section-title">
               <span>03</span>
 
               <div>
                 <h2>Event Image</h2>
+
                 <p>Add an image URL for your event.</p>
               </div>
             </div>
@@ -306,13 +366,17 @@ const AddEvent = () => {
             </div>
           </div>
 
-          {/* Description */}
+          {/* =========================
+              04 DESCRIPTION
+          ========================= */}
+
           <div className="form-section">
             <div className="form-section-title">
               <span>04</span>
 
               <div>
                 <h2>Event Description</h2>
+
                 <p>Give users more information about your event.</p>
               </div>
             </div>
@@ -332,18 +396,24 @@ const AddEvent = () => {
             </div>
           </div>
 
-          {/* Status */}
+          {/* =========================
+              05 EVENT STATUS
+          ========================= */}
+
           <div className="form-section">
             <div className="form-section-title">
               <span>05</span>
 
               <div>
                 <h2>Event Status</h2>
+
                 <p>Choose whether the event should be visible to users.</p>
               </div>
             </div>
 
             <div className="status-options">
+              {/* LIVE */}
+
               <label
                 className={`status-option ${
                   formData.status === "Live" ? "selected" : ""
@@ -359,9 +429,12 @@ const AddEvent = () => {
 
                 <div>
                   <strong>🟢 Live</strong>
+
                   <span>Event will be visible to users.</span>
                 </div>
               </label>
+
+              {/* DRAFT */}
 
               <label
                 className={`status-option ${
@@ -378,13 +451,17 @@ const AddEvent = () => {
 
                 <div>
                   <strong>📝 Draft</strong>
+
                   <span>Event will not be shown to users.</span>
                 </div>
               </label>
             </div>
           </div>
 
-          {/* Actions */}
+          {/* =========================
+              ACTIONS
+          ========================= */}
+
           <div className="add-event-actions">
             <Link to="/admin/dashboard" className="cancel-event-btn">
               Cancel
