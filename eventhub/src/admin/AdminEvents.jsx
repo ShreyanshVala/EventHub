@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./AdminEvents.css";
 
+// LIVE BACKEND
+const API_URL = "https://eventhub-34ok.onrender.com";
+
 function AdminEvents() {
   const navigate = useNavigate();
 
@@ -9,7 +12,9 @@ function AdminEvents() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Check Admin Login + Load Events
+  // =========================
+  // CHECK ADMIN + LOAD EVENTS
+  // =========================
   useEffect(() => {
     const admin = JSON.parse(localStorage.getItem("eventHubAdmin"));
 
@@ -29,7 +34,7 @@ function AdminEvents() {
       setLoading(true);
       setError("");
 
-      const response = await fetch("http://localhost:5000/api/events");
+      const response = await fetch(`${API_URL}/api/events`);
 
       const data = await response.json();
 
@@ -37,12 +42,14 @@ function AdminEvents() {
         throw new Error(data.message || "Failed to load events");
       }
 
-      setEvents(data);
+      console.log("Live Events:", data);
+
+      setEvents(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Load events error:", err);
 
       setError(
-        "Unable to load events. Please make sure backend server is running.",
+        "Unable to load events. Please check the live backend connection.",
       );
     } finally {
       setLoading(false);
@@ -60,7 +67,7 @@ function AdminEvents() {
     if (!confirmDelete) return;
 
     try {
-      const response = await fetch(`http://localhost:5000/api/events/${id}`, {
+      const response = await fetch(`${API_URL}/api/events/${id}`, {
         method: "DELETE",
       });
 
@@ -70,7 +77,6 @@ function AdminEvents() {
         throw new Error(data.message || "Failed to delete event");
       }
 
-      // Remove from screen
       setEvents((prevEvents) => prevEvents.filter((event) => event._id !== id));
 
       alert("Event deleted successfully!");
@@ -88,18 +94,17 @@ function AdminEvents() {
     const newStatus = event.status === "Live" ? "Draft" : "Live";
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/events/${event._id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status: newStatus,
-          }),
+      const response = await fetch(`${API_URL}/api/events/${event._id}`, {
+        method: "PUT",
+
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+
+        body: JSON.stringify({
+          status: newStatus,
+        }),
+      });
 
       const data = await response.json();
 
@@ -107,10 +112,16 @@ function AdminEvents() {
         throw new Error(data.message || "Failed to update status");
       }
 
-      // Update screen
+      console.log("Event status updated:", data);
+
       setEvents((prevEvents) =>
         prevEvents.map((item) =>
-          item._id === event._id ? { ...item, status: newStatus } : item,
+          item._id === event._id
+            ? {
+                ...item,
+                status: newStatus,
+              }
+            : item,
         ),
       );
     } catch (err) {
@@ -188,6 +199,10 @@ function AdminEvents() {
           </Link>
 
           <Link to="/admin/events/add">➕ Add Event</Link>
+
+          <Link to="/admin/bookings">📋 Bookings</Link>
+
+          <Link to="/admin/users">👥 Users</Link>
         </nav>
 
         <button className="admin-logout-btn" onClick={handleLogout}>
