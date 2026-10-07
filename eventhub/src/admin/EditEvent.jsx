@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import "./EditEvent.css";
 
+// LIVE BACKEND
+const API_URL = "https://eventhub-34ok.onrender.com";
+
 const EditEvent = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -37,20 +40,22 @@ const EditEvent = () => {
   }, [id, navigate]);
 
   // =========================
-  // LOAD EVENT FROM MONGODB
+  // LOAD EVENT FROM LIVE BACKEND
   // =========================
   const loadEvent = async () => {
     try {
       setLoading(true);
       setError("");
 
-      const response = await fetch(`http://localhost:5000/api/events/${id}`);
+      const response = await fetch(`${API_URL}/api/events/${id}`);
 
       const data = await response.json();
 
       if (!response.ok) {
         throw new Error(data.message || "Event not found");
       }
+
+      console.log("Live Event:", data);
 
       setFormData({
         title: data.title || "",
@@ -130,7 +135,7 @@ const EditEvent = () => {
     try {
       setUpdating(true);
 
-      const response = await fetch(`http://localhost:5000/api/events/${id}`, {
+      const response = await fetch(`${API_URL}/api/events/${id}`, {
         method: "PUT",
 
         headers: {
@@ -155,6 +160,8 @@ const EditEvent = () => {
       if (!response.ok) {
         throw new Error(data.message || "Failed to update event");
       }
+
+      console.log("Event updated successfully:", data);
 
       alert("Event updated successfully!");
 
@@ -255,19 +262,12 @@ const EditEvent = () => {
                   onChange={handleChange}
                 >
                   <option value="Music">Music</option>
-
                   <option value="Technology">Technology</option>
-
                   <option value="Sports">Sports</option>
-
                   <option value="Entertainment">Entertainment</option>
-
                   <option value="Business">Business</option>
-
                   <option value="Workshop">Workshop</option>
-
                   <option value="Education">Education</option>
-
                   <option value="Other">Other</option>
                 </select>
               </div>
