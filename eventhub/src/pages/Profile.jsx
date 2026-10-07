@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "./Profile.css";
 
+const API_URL = "https://eventhub-34ok.onrender.com";
+
 function Profile() {
   const navigate = useNavigate();
 
@@ -17,15 +19,20 @@ function Profile() {
   // LOAD PROFILE + BOOKINGS
   // =========================
   useEffect(() => {
-    const loggedInUser = JSON.parse(localStorage.getItem("eventHubLoggedIn"));
+    try {
+      const loggedInUser = JSON.parse(localStorage.getItem("eventHubLoggedIn"));
 
-    if (!loggedInUser) {
+      if (!loggedInUser) {
+        navigate("/login");
+        return;
+      }
+
+      loadProfile(loggedInUser.email);
+      loadBookings(loggedInUser.email);
+    } catch (error) {
+      console.error("Login data error:", error);
       navigate("/login");
-      return;
     }
-
-    loadProfile(loggedInUser.email);
-    loadBookings(loggedInUser.email);
   }, [navigate]);
 
   // =========================
@@ -35,23 +42,31 @@ function Profile() {
     try {
       setLoading(true);
 
-      const response = await fetch(
-        `http://localhost:5000/api/users/email/${encodeURIComponent(email)}`,
+      console.log(
+        "PROFILE API:",
+        `${API_URL}/api/users/email/${encodeURIComponent(email)}`,
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to load profile");
-      }
+      const response = await fetch(
+        `${API_URL}/api/users/email/${encodeURIComponent(email)}`,
+      );
 
       const data = await response.json();
 
+      console.log("PROFILE STATUS:", response.status);
+      console.log("PROFILE RESPONSE:", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to load profile");
+      }
+
       setUser(data);
-      setName(data.name || "");
+      setName(data.name || data.fullName || "");
       setPhone(data.phone || "");
     } catch (error) {
       console.error("Load profile error:", error);
 
-      alert("Failed to load profile.");
+      alert(error.message || "Failed to load profile.");
 
       navigate("/login");
     } finally {
@@ -64,19 +79,28 @@ function Profile() {
   // =========================
   const loadBookings = async (email) => {
     try {
-      const response = await fetch(
-        `http://localhost:5000/api/bookings/user/${encodeURIComponent(email)}`,
+      console.log(
+        "PROFILE BOOKINGS API:",
+        `${API_URL}/api/bookings/user/${encodeURIComponent(email)}`,
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to load bookings");
-      }
+      const response = await fetch(
+        `${API_URL}/api/bookings/user/${encodeURIComponent(email)}`,
+      );
 
       const data = await response.json();
 
-      setBookings(data);
+      console.log("PROFILE BOOKINGS STATUS:", response.status);
+      console.log("PROFILE BOOKINGS RESPONSE:", data);
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to load bookings");
+      }
+
+      setBookings(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Load bookings error:", error);
+      setBookings([]);
     }
   };
 
@@ -99,27 +123,27 @@ function Profile() {
     try {
       setSaving(true);
 
-      const response = await fetch(
-        `http://localhost:5000/api/users/${user._id}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: trimmedName,
-            phone: phone.trim(),
-          }),
+      const response = await fetch(`${API_URL}/api/users/${user._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          name: trimmedName,
+          phone: phone.trim(),
+        }),
+      });
 
       const data = await response.json();
+
+      console.log("UPDATE PROFILE STATUS:", response.status);
+      console.log("UPDATE PROFILE RESPONSE:", data);
 
       if (!response.ok) {
         throw new Error(data.message || "Failed to update profile");
       }
 
-      const updatedUser = data.user;
+      const updatedUser = data.user || data;
 
       // Update React state
       setUser(updatedUser);
